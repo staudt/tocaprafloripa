@@ -4,45 +4,95 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Browser-based pseudo-3D driving game inspired by **Outrun** (segment-based road rendering, city-to-beach journey) and **Top Gear SNES** (speech balloons). Built with vanilla JS + Canvas, no build step, no dependencies.
+**"Toca pra Floripa"** — A Brazilian Portuguese comedy road trip game. Drive from Porto Alegre to Florianópolis with your family, passing through real locations (Canoas, Viamão, Osório, Freeway, Tramandaí, Litoral Gaúcho). Each location has unique road characteristics, traffic patterns, and comedy dialogue. Built with vanilla JS + Canvas, ES modules, no build step, no dependencies.
 
 ## Running the Game
 
-Open `index.html` in a browser. There is no build step, no package manager, no test suite, and no linter. The entire game is two files: `index.html` (canvas + CSS scaling) and `game.js` (single IIFE, ~560 lines).
+Requires an HTTP server (ES modules don't work with `file://`):
+```
+py -m http.server 8080
+```
+Then open `http://localhost:8080`.
 
-## Architecture (game.js)
+No build step, no package manager, no test suite, no linter.
 
-The game runs as a single IIFE with `requestAnimationFrame`. There is no module system — everything lives in function scope.
+## Architecture (ES Modules)
+
+```
+index.html           — canvas + CSS scaling, loads src/main.js as type="module"
+src/
+  main.js            — entry point, game loop, state machine (MENU → PLAYING → ARRIVAL)
+  config.js          — constants (canvas, physics, rendering, etc.)
+  state.js           — shared mutable game state object (game.*)
+  utils.js           — clamp, lerp, easeInOut, percentRemaining, fogFactor
+  input.js           — keyboard tracking, isUp/isDown/isLeft/isRight
+  locations.js       — location configs (road generation templates + events)
+  road.js            — procedural road generation from location configs
+  traffic.js         — per-location traffic spawning and movement
+  player.js          — player physics, location detection, event system
+  render.js          — projection, segment/sprite/car rendering
+  hud.js             — speed, progress, location name display
+  screens.js         — menu, arrival, game over screens (all in Portuguese)
+```
 
 ### Key Concepts
 
-**Segment-based road**: The track is an array of segments, each with start/end points (`p1`/`p2`), a `curve` value, and world-space Y elevation. The track loops — when the player reaches the end, position wraps to 0.
+**Segment-based road**: The track is an array of segments, each with `p1`/`p2` points, a `curve` value, and per-segment properties: `lanes`, `roadWidth`, `twoWay`, `locationId`.
 
-**Projection math** (Jake Gordon's JavaScript Racer approach): Segments are projected from world space to screen space using `scale = CAMERA_DEPTH / camera.z`. Curves are an illusion — an accumulated x-offset (`dx += seg.curve`) shifts each segment further as distance increases. Hills use per-segment Y elevation with camera following the road surface.
+**Data-driven locations** (`locations.js`): Each location is a generation template with parameters for road character (curve frequency/intensity, hill frequency/intensity), traffic (density, speed range), roadside sprites, and scripted events. The road builder procedurally generates segments from these params — each playthrough is different.
 
-**Rendering order**: Segments draw near-to-far with a `maxY` clipping line that rises as farther segments are rendered (this hides road behind hills). Sprites (traffic cars) are collected during the segment pass and drawn back-to-front afterward.
+**Location config keys**: `length`, `lanes`, `twoWay`, `roadWidth`, `curves: { frequency, minLen, maxLen, minIntensity, maxIntensity }`, `hills: { frequency, minLen, maxLen, minHeight, maxHeight }`, `traffic: { density, speedRange }`, `sprites: { types, frequency, colors }`, `events: [{ at, type, speaker, text }]`, `palette`.
 
-**Drawing layers per segment**: grass strip (full width) → rumble polygon (wider than road) → road polygon (on top) → lane markings (light segments only).
+**Event system**: Events fire when the player crosses a progress threshold within a location. Currently supports `'dialogue'` type. Extensible for future types (gas station, police radar, etc.).
+
+**Projection math** (Jake Gordon's JavaScript Racer approach): `scale = CAMERA_DEPTH / camera.z`. Curves via accumulated x-offset. Per-segment `roadWidth` passed to `project()` for variable road widths.
+
+**Rendering order**: Sky gradient → grass base → segments (near-to-far with maxY clipping) → sprites (back-to-front) → player car → speech bubble → HUD.
+
+**Game state machine**: `MENU` → `PLAYING` → `ARRIVAL` (or `GAME_OVER`). Menu shows "Toca pra Floripa" title. All UI in Brazilian Portuguese.
 
 ### Road Generation
 
-`addRoad(enter, hold, leave, curve, y)` is the core builder — uses `easeInOut` for smooth curve/elevation transitions. Helpers (`addStraight`, `addCurve`, `addHill`, `addSCurve`, `addLowRollingHills`) compose on top. After generation, segment endpoints are patched so `p2.y` matches the next segment's `p1.y` for smooth slopes. Colors are assigned by track position: city (0–20%) → highway (20–45%) → countryside (45–75%) → coast (75–100%).
+`generateLocationRoad(location)` divides the target length into random stretches, rolls against curve/hill frequencies, and generates segments with random parameters within the location's configured ranges. `buildTrack()` iterates all locations in order, generating road for each, then patches elevation for smooth transitions.
 
 ### Player & Traffic
 
-- Player: WASD/Arrow keys, centrifugal force on curves, off-road speed penalty when `|player.x| > 1`, clamped to ±2.5
-- Traffic: 12 cars at random positions/speeds (30–80% of max), assigned to segment `.cars[]` arrays, drawn as colored rectangles with basic shading
-- No collision detection yet — player passes through traffic
+- Player: WASD/Arrow keys, centrifugal force, off-road penalty, jump physics on hill crests
+- Traffic: spawned per-location based on `traffic.density` and `traffic.speedRange`
+- No collision detection yet
+
+## Current Route
+
+Porto Alegre → Canoas → Viamão → Osório → Freeway → Tramandaí → Litoral Gaúcho → Florianópolis
 
 ## Current Status
 
-**Phase 1 is complete**: road rendering, curves, hills, rumble strips, lane markings, traffic cars, player controls, 4 color-palette sections, HUD (speed/section/progress), CSS-scaled canvas.
+**Completed**:
+- ES module architecture (11 files under src/)
+- Game state machine (MENU, PLAYING, ARRIVAL, GAME_OVER)
+- Procedural road generation from location configs
+- 8 locations with unique palettes, road params, traffic, and dialogue events
+- Per-segment lanes, road width, and twoWay properties
+- Location-based traffic spawning
+- Event system (dialogue triggers at progress points)
+- Speech bubbles with speaker-side positioning
+- Arrival detection (reach Florianópolis → victory screen)
 
-**Phase 2 (not started)**: speech balloons at milestones, environmental sprites (buildings, trees, palms), traffic AI + collision, sound effects, intro/outro screens, possible time limit/checkpoints/score.
+**Next steps (not started)**:
+- Two-way road rendering + oncoming traffic
+- Car selection screen (Chevette, Maverick, Fiat 147, etc.) with stats
+- Fuel system + gas stations
+- Money/damage economy
+- Collision detection
+- Parallax scrolling backgrounds
+- Comedy dialogue expansion
+- Radio/music system (Web Audio API)
+- Varied vehicle sprites (trucks, motorcycles)
 
 ## Known Issues
 
-- Track loops at end — no finish line
 - Fixed DT = 1/60 with no delta-time correction (speed tied to frame rate)
 - `fogFactor()` utility exists but is unused
 - Player car is a simple rectangle with no animation
+- Two-way flag is stored on segments but not yet rendered
+- `game.js` (old monolithic file) still exists but is unused — can be deleted
