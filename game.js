@@ -852,8 +852,13 @@
     // --- Draw sprites back-to-front (farthest first) ---
     spritesToDraw.sort((a, b) => b.n - a.n);
     for (const item of spritesToDraw) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, CANVAS_W, item.clipY);
+      ctx.clip();
       if (item.car) drawCarSprite(item.car, item.seg, item.clipY);
       else if (item.sprite) drawRoadsideSprite(item.sprite, item.seg, item.clipY);
+      ctx.restore();
     }
 
     // --- Player car ---
