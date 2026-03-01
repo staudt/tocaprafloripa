@@ -9,6 +9,7 @@ import {
 import { game } from './state.js';
 import { isUp, isDown, isLeft, isRight } from './input.js';
 import { clamp } from './utils.js';
+import { showBubble, isBubbleActive } from './dialogue.js';
 
 // --- Location & event helpers --------------------------------------------
 
@@ -31,9 +32,7 @@ function checkEvents(range, segIdx) {
     if (progress >= event.at) {
       event.fired = true;
       if (event.type === 'dialogue') {
-        game.bubbleText = event.text;
-        game.bubbleTimer = 3;
-        game.bubbleSide = event.speaker === 'driver' ? 'left' : 'right';
+        showBubble(event.text, 3, event.speaker);
       }
     }
   }
@@ -104,13 +103,9 @@ export function updatePlayer() {
   checkEvents(range, segIdx);
 
   // If location just changed and no event dialogue is showing, show location name
-  if (locationChanged && game.bubbleTimer <= 0) {
-    game.bubbleText = range.name;
-    game.bubbleTimer = 3;
-    game.bubbleSide = 'left';
+  if (locationChanged && !isBubbleActive()) {
+    showBubble(range.name, 3, 'driver');
   }
-
-  if (game.bubbleTimer > 0) game.bubbleTimer -= DT;
 
   // Check if player reached the end (last location, near the end)
   const lastRange = game.locationRanges[game.locationRanges.length - 1];

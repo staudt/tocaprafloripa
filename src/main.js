@@ -9,6 +9,7 @@ import { spawnCars, updateCars } from './traffic.js';
 import { updatePlayer } from './player.js';
 import { render } from './render.js';
 import { drawMenuScreen, drawArrivalScreen, drawGameOverScreen } from './screens.js';
+import { updateBubble } from './dialogue.js';
 
 // --- Init ----------------------------------------------------------------
 
@@ -49,6 +50,7 @@ function frame() {
 
     case 'PLAYING':
       updatePlayer();
+      updateBubble();
       updateCars();
       render();
       break;

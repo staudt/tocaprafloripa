@@ -4,6 +4,7 @@
 
 import { CANVAS_W, CANVAS_H } from './config.js';
 import { game } from './state.js';
+import { drawText } from './draw.js';
 
 const ctx = game.ctx;
 
@@ -28,79 +29,46 @@ export function drawMenuScreen() {
   }
 
   // Title
-  ctx.fillStyle = '#ffcc00';
-  ctx.font = 'bold 52px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('TOCA PRA FLORIPA', CANVAS_W / 2, 160);
+  drawText('TOCA PRA FLORIPA', CANVAS_W / 2, 160, { color: '#ffcc00', font: 'bold 52px monospace', align: 'center' });
 
   // Subtitle
-  ctx.fillStyle = '#88aacc';
-  ctx.font = '20px monospace';
-  ctx.fillText('Porto Alegre \u2192 Florian\u00f3polis', CANVAS_W / 2, 210);
+  drawText('Porto Alegre \u2192 Florian\u00f3polis', CANVAS_W / 2, 210, { color: '#88aacc', font: '20px monospace', align: 'center' });
 
   // Tagline
-  ctx.fillStyle = '#667788';
-  ctx.font = '14px monospace';
-  ctx.fillText('Uma viagem inesquec\u00edvel com a fam\u00edlia', CANVAS_W / 2, 245);
+  drawText('Uma viagem inesquec\u00edvel com a fam\u00edlia', CANVAS_W / 2, 245, { color: '#667788', font: '14px monospace', align: 'center' });
 
   // Start prompt (blinking)
   const blink = Math.sin(Date.now() / 400) > 0;
   if (blink) {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('Aperte ENTER pra come\u00e7ar', CANVAS_W / 2, 380);
+    drawText('Aperte ENTER pra come\u00e7ar', CANVAS_W / 2, 380, { color: '#ffffff', font: 'bold 18px monospace', align: 'center' });
   }
 
   // Footer
-  ctx.fillStyle = '#445566';
-  ctx.font = '12px monospace';
-  ctx.fillText('WASD ou setas pra dirigir', CANVAS_W / 2, CANVAS_H - 30);
-
-  ctx.textAlign = 'left';
+  drawText('WASD ou setas pra dirigir', CANVAS_W / 2, CANVAS_H - 30, { color: '#445566', font: '12px monospace', align: 'center' });
 }
 
 export function drawArrivalScreen() {
   ctx.fillStyle = '#0a2010';
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-  ctx.fillStyle = '#44dd66';
-  ctx.font = 'bold 42px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('CHEGAMOS!', CANVAS_W / 2, 180);
-
-  ctx.fillStyle = '#88ccaa';
-  ctx.font = '20px monospace';
-  ctx.fillText('Florian\u00f3polis, finalmente!', CANVAS_W / 2, 230);
+  drawText('CHEGAMOS!', CANVAS_W / 2, 180, { color: '#44dd66', font: 'bold 42px monospace', align: 'center' });
+  drawText('Florian\u00f3polis, finalmente!', CANVAS_W / 2, 230, { color: '#88ccaa', font: '20px monospace', align: 'center' });
 
   const blink = Math.sin(Date.now() / 400) > 0;
   if (blink) {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('Aperte ENTER pra jogar de novo', CANVAS_W / 2, 380);
+    drawText('Aperte ENTER pra jogar de novo', CANVAS_W / 2, 380, { color: '#ffffff', font: 'bold 18px monospace', align: 'center' });
   }
-
-  ctx.textAlign = 'left';
 }
 
 export function drawGameOverScreen() {
   ctx.fillStyle = '#200a0a';
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-  ctx.fillStyle = '#dd4444';
-  ctx.font = 'bold 42px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('FIM DE VIAGEM', CANVAS_W / 2, 180);
-
-  ctx.fillStyle = '#cc8888';
-  ctx.font = '20px monospace';
-  ctx.fillText('Ficou sem grana... ou sem carro.', CANVAS_W / 2, 230);
+  drawText('FIM DE VIAGEM', CANVAS_W / 2, 180, { color: '#dd4444', font: 'bold 42px monospace', align: 'center' });
+  drawText('Ficou sem grana... ou sem carro.', CANVAS_W / 2, 230, { color: '#cc8888', font: '20px monospace', align: 'center' });
 
   const blink = Math.sin(Date.now() / 400) > 0;
   if (blink) {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('Aperte ENTER pra tentar de novo', CANVAS_W / 2, 380);
+    drawText('Aperte ENTER pra tentar de novo', CANVAS_W / 2, 380, { color: '#ffffff', font: 'bold 18px monospace', align: 'center' });
   }
-
-  ctx.textAlign = 'left';
 }

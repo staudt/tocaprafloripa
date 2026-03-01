@@ -2,26 +2,20 @@
 // HUD
 // ============================================================================
 
-import { CANVAS_W, MAX_SPEED, SEG_LEN } from './config.js';
+import { CANVAS_W, MAX_SPEED } from './config.js';
 import { game } from './state.js';
-
-const ctx = game.ctx;
+import { drawText } from './draw.js';
 
 export function drawHud() {
   const player = game.player;
   const kmh = Math.round(player.speed / MAX_SPEED * 160);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 20px monospace';
-  ctx.fillText(kmh + ' km/h', 20, 30);
+  drawText(kmh + ' km/h', 20, 30, { color: '#ffffff', font: 'bold 20px monospace' });
 
   // Progress
   const pct = Math.round((player.z / game.trackLength) * 100);
-  ctx.fillText(pct + '%', CANVAS_W - 80, 30);
+  drawText(pct + '%', CANVAS_W - 80, 30, { color: '#ffffff', font: 'bold 20px monospace' });
 
   // Location name
   const section = game.currentSection || '';
-  ctx.font = '14px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(section, CANVAS_W / 2, 25);
-  ctx.textAlign = 'left';
+  drawText(section, CANVAS_W / 2, 25, { color: '#ffffff', font: '14px monospace', align: 'center' });
 }

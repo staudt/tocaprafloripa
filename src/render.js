@@ -11,6 +11,7 @@ import { lerp, percentRemaining } from './utils.js';
 import { isLeft, isRight } from './input.js';
 import { getPalette } from './road.js';
 import { drawHud } from './hud.js';
+import { roundRect, drawShadedRect } from './draw.js';
 
 const ctx = game.ctx;
 
@@ -115,14 +116,7 @@ function drawCarSprite(car, seg, clipY) {
 
   if (y - h >= clipY) return;
 
-  ctx.fillStyle = car.color;
-  ctx.fillRect(x - w / 2, y - h, w, h);
-
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.fillRect(x - w / 2, y - h, w * 0.3, h);
-
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(x - w * 0.35, y - h * 0.95, w * 0.7, h * 0.3);
+  drawShadedRect(x - w / 2, y - h, w, h, car.color);
 }
 
 function drawRoadsideSprite(sprite, seg, clipY) {
@@ -220,14 +214,7 @@ function drawPlayerCar() {
     ctx.fillRect(x - w * shadowScale / 2, groundY - 4, w * shadowScale, 4);
   }
 
-  ctx.fillStyle = '#2255ee';
-  ctx.fillRect(x - w / 2, y - h, w, h);
-
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.fillRect(x - w / 2, y - h, w * 0.3, h);
-
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(x - w * 0.35, y - h * 0.95, w * 0.7, h * 0.3);
+  drawShadedRect(x - w / 2, y - h, w, h, '#2255ee');
 
   if (isLeft()) {
     ctx.fillStyle = '#2255ee';
@@ -263,17 +250,7 @@ function drawSpeechBubble(text, timer, side) {
   ctx.globalAlpha = alpha;
 
   ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.moveTo(bx + r, by);
-  ctx.lineTo(bx + bw - r, by);
-  ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
-  ctx.lineTo(bx + bw, by + bh - r);
-  ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - r, by + bh);
-  ctx.lineTo(bx + r, by + bh);
-  ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
-  ctx.lineTo(bx, by + r);
-  ctx.quadraticCurveTo(bx, by, bx + r, by);
-  ctx.closePath();
+  roundRect(bx, by, bw, bh, r);
   ctx.fill();
   ctx.strokeStyle = '#333333';
   ctx.lineWidth = 2;
@@ -301,10 +278,6 @@ function drawSpeechBubble(text, timer, side) {
   ctx.fillText(text, bx + padX, by + bh - padY);
 
   ctx.globalAlpha = 1;
-}
-
-function drawBubble() {
-  drawSpeechBubble(game.bubbleText, game.bubbleTimer, game.bubbleSide || 'left');
 }
 
 export function drawSky(palette) {
@@ -385,6 +358,6 @@ export function render() {
 
   // Player car & HUD
   drawPlayerCar();
-  drawBubble();
+  drawSpeechBubble(game.bubbleText, game.bubbleTimer, game.bubbleSide || 'left');
   drawHud();
 }
