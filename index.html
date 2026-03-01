@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>City to Beach</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+    canvas { image-rendering: pixelated; display: block; }
+  </style>
+  <script>
+    function resizeCanvas() {
+      var c = document.getElementById('c');
+      if (!c) return;
+      var ratio = 960 / 540;
+      var w = window.innerWidth, h = window.innerHeight;
+      if (w / h > ratio) { c.style.height = h + 'px'; c.style.width = Math.round(h * ratio) + 'px'; }
+      else { c.style.width = w + 'px'; c.style.height = Math.round(w / ratio) + 'px'; }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', resizeCanvas);
+  </script>
+</head>
+<body>
+  <canvas id="c" width="960" height="540"></canvas>
+  <script src="game.js"></script>
+</body>
+</html>
