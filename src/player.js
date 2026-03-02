@@ -65,8 +65,8 @@ const COLLISION_LINES = [
 function triggerCollision(car) {
   const player = game.player;
 
-  // Speed penalty
-  player.speed *= COLLISION_SPEED_MULT;
+  // Full stop on rear-end collision
+  player.speed = 0;
 
   // Invincibility grace period
   player.invincibleTimer = COLLISION_INVINCIBLE;
@@ -74,8 +74,8 @@ function triggerCollision(car) {
   // Screen flash
   player.collisionFlash = COLLISION_FLASH;
 
-  // Lateral nudge away from the car
-  const pushDir = player.x > car.offset ? 1 : -1;
+  // Lateral nudge away from the car (player.x is 2x car.offset scale)
+  const pushDir = player.x > 2 * car.offset ? 1 : -1;
   player.x += pushDir * 0.15;
   player.x = clamp(player.x, -2.5, 2.5);
 
@@ -112,8 +112,8 @@ function checkCollisions() {
       if (dz < 0) dz += game.trackLength;
       if (dz > COLLISION_Z) continue;
 
-      // X overlap
-      if (Math.abs(player.x - car.offset) < COLLISION_X) {
+      // X overlap (player.x is 2x the scale of car.offset)
+      if (Math.abs(player.x - 2 * car.offset) < COLLISION_X) {
         triggerCollision(car);
         return;
       }
