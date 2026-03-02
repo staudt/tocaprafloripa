@@ -4,7 +4,8 @@
 
 import {
   ACCEL, BRAKE, DECEL, MAX_SPEED, OFF_ROAD_DECEL, UPHILL_DECEL,
-  STEER_SPEED, CENTRIFUGAL, SEG_LEN, JUMP_GRAVITY, JUMP_SPEED_THRESHOLD, DT
+  STEER_SPEED, CENTRIFUGAL, SEG_LEN, JUMP_GRAVITY, JUMP_SPEED_THRESHOLD, DT,
+  COLLISION_Z, COLLISION_X, COLLISION_INVINCIBLE, COLLISION_SPEED_MULT, COLLISION_FLASH
 } from './config.js';
 import { game } from './state.js';
 import { isUp, isDown, isLeft, isRight } from './input.js';
@@ -33,6 +34,88 @@ function checkEvents(range, segIdx) {
       event.fired = true;
       if (event.type === 'dialogue') {
         showBubble(event.text, 3, event.speaker);
+      }
+    }
+  }
+}
+
+// --- Collision -----------------------------------------------------------
+
+const COLLISION_LINES = [
+  { speaker: 'driver', text: 'Eita! Dei uma encostadinha...' },
+  { speaker: 'driver', text: 'Foi só um toquinho!' },
+  { speaker: 'driver', text: 'A culpa é do outro!' },
+  { speaker: 'driver', text: 'Calma, tá tudo bem!' },
+  { speaker: 'driver', text: 'Ih, raspei o carro...' },
+  { speaker: 'driver', text: 'O seguro cobre, relaxa!' },
+  { speaker: 'wife',   text: 'EU SABIA! Eu avisei!' },
+  { speaker: 'wife',   text: 'Olha pra frente, pelo amor!' },
+  { speaker: 'wife',   text: 'Devolve a carteira, pelo amor de Deus!' },
+  { speaker: 'wife',   text: 'Era pra ter ido de ônibus!' },
+  { speaker: 'wife',   text: 'Meu Deus do céu!!!' },
+  { speaker: 'wife',   text: 'Eu dirijo melhor que tu!' },
+  { speaker: 'kid',    text: 'AEEE BATEU! De novo, pai!' },
+  { speaker: 'kid',    text: 'Parece carrinho de bate-bate!' },
+  { speaker: 'kid',    text: 'Faz de novo! Hahahaha!' },
+  { speaker: 'kid',    text: 'O pai não sabe dirigir!' },
+  { speaker: 'kid',    text: 'Iiih vai dar B.O.!' },
+  { speaker: 'kid',    text: 'Mamãe, o pai bateu o carro!' },
+];
+
+function triggerCollision(car) {
+  const player = game.player;
+
+  // Speed penalty
+  player.speed *= COLLISION_SPEED_MULT;
+
+  // Invincibility grace period
+  player.invincibleTimer = COLLISION_INVINCIBLE;
+
+  // Screen flash
+  player.collisionFlash = COLLISION_FLASH;
+
+  // Lateral nudge away from the car
+  const pushDir = player.x > car.offset ? 1 : -1;
+  player.x += pushDir * 0.15;
+  player.x = clamp(player.x, -2.5, 2.5);
+
+  // Comedy speech bubble
+  const line = COLLISION_LINES[Math.floor(Math.random() * COLLISION_LINES.length)];
+  showBubble(line.text, 2.5, line.speaker);
+}
+
+function checkCollisions() {
+  const player = game.player;
+
+  // Tick down collision flash (always, even while invincible)
+  if (player.collisionFlash > 0) player.collisionFlash -= DT;
+
+  // Tick down invincibility — skip collision check if still active
+  if (player.invincibleTimer > 0) {
+    player.invincibleTimer -= DT;
+    return;
+  }
+
+  // No collisions while airborne (jumping over cars is fun)
+  if (player.jumpH > 20) return;
+
+  const playerSegIdx = Math.floor(player.z / SEG_LEN) % game.segments.length;
+
+  // Check current segment and next 2 ahead
+  for (let n = 0; n <= 2; n++) {
+    const segIdx = (playerSegIdx + n) % game.segments.length;
+    const seg = game.segments[segIdx];
+
+    for (const car of seg.cars) {
+      // Z proximity
+      let dz = car.z - player.z;
+      if (dz < 0) dz += game.trackLength;
+      if (dz > COLLISION_Z) continue;
+
+      // X overlap
+      if (Math.abs(player.x - car.offset) < COLLISION_X) {
+        triggerCollision(car);
+        return;
       }
     }
   }
@@ -106,6 +189,9 @@ export function updatePlayer() {
   if (locationChanged && !isBubbleActive()) {
     showBubble(range.name, 3, 'driver');
   }
+
+  // Collision detection
+  checkCollisions();
 
   // Check if player reached the end (last location, near the end)
   const lastRange = game.locationRanges[game.locationRanges.length - 1];

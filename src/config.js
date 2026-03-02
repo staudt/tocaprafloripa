@@ -29,6 +29,13 @@ export const JUMP_SPEED_THRESHOLD = 0.5;                        // min speed % t
 
 export const NUM_CARS = 12;
 
+// Collision
+export const COLLISION_Z = 300;          // world units — Z proximity threshold
+export const COLLISION_X = 0.35;         // road half-widths — lateral overlap threshold
+export const COLLISION_INVINCIBLE = 2;   // seconds of post-collision grace
+export const COLLISION_SPEED_MULT = 0.6; // multiply speed on hit (lose 40%)
+export const COLLISION_FLASH = 0.3;      // seconds of red screen flash
+
 // --- Color palettes per road section -------------------------------------
 
 export const COLORS = {

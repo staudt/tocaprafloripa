@@ -202,6 +202,12 @@ function drawRoadsideSprite(sprite, seg, clipY) {
 
 function drawPlayerCar() {
   const player = game.player;
+
+  // Blink during invincibility
+  if (player.invincibleTimer > 0 && Math.floor(player.invincibleTimer * 8) % 2 === 0) {
+    return;
+  }
+
   const w = 60;
   const h = 80;
   const x = CANVAS_W / 2;
@@ -358,6 +364,14 @@ export function render() {
 
   // Player car & HUD
   drawPlayerCar();
+
+  // Collision flash overlay
+  if (game.player.collisionFlash > 0) {
+    const flashAlpha = (game.player.collisionFlash / 0.3) * 0.35;
+    ctx.fillStyle = `rgba(255, 50, 50, ${flashAlpha})`;
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+  }
+
   drawSpeechBubble(game.bubbleText, game.bubbleTimer, game.bubbleSide || 'left');
   drawHud();
 }

@@ -20,6 +20,8 @@ function initGame() {
   game.player.jumpH = 0;
   game.player.jumpV = 0;
   game.player.climbH = 0;
+  game.player.invincibleTimer = 0;
+  game.player.collisionFlash = 0;
   game.currentSection = '';
   game.currentLocation = null;
   game.bubbleTimer = 0;

@@ -31,6 +31,8 @@ export const game = {
     jumpH: 0,        // current jump height in pixels
     jumpV: 0,        // current jump velocity in pixels/s
     climbH: 0,       // accumulated elevation gain during current uphill
+    invincibleTimer: 0,  // post-collision grace period (seconds)
+    collisionFlash: 0,   // red flash overlay timer (seconds)
   },
 
   // Speech bubble
