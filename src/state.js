@@ -28,6 +28,7 @@ export const game = {
     z: 0,
     x: 0,      // -2..2 = on road, beyond = off road
     speed: 0,
+    steer: 0,  // -1..1 smooth steering value for sprite frame selection
     jumpH: 0,        // current jump height in pixels
     jumpV: 0,        // current jump velocity in pixels/s
     climbH: 0,       // accumulated elevation gain during current uphill

@@ -40,7 +40,7 @@ export const LOCATIONS = [
       minLen: 6, maxLen: 16,
       minHeight: 100, maxHeight: 400,
     },
-    traffic: { density: 12, speedRange: [0.3, 0.6] },
+    traffic: { density: 36, speedRange: [0.3, 0.6] },
     sprites: {
       types: ['building'],
       frequency: 8,
@@ -77,7 +77,7 @@ export const LOCATIONS = [
       minLen: 8, maxLen: 20,
       minHeight: 50, maxHeight: 300,
     },
-    traffic: { density: 8, speedRange: [0.3, 0.55] },
+    traffic: { density: 16, speedRange: [0.3, 0.55] },
     sprites: {
       types: ['building', 'tree'],
       frequency: 10,
@@ -112,7 +112,7 @@ export const LOCATIONS = [
       minLen: 10, maxLen: 30,
       minHeight: 200, maxHeight: 800,
     },
-    traffic: { density: 6, speedRange: [0.2, 0.5] },
+    traffic: { density: 12, speedRange: [0.2, 0.5] },
     sprites: {
       types: ['tree'],
       frequency: 12,
@@ -148,7 +148,7 @@ export const LOCATIONS = [
       minLen: 10, maxLen: 40,
       minHeight: 400, maxHeight: 2000,
     },
-    traffic: { density: 5, speedRange: [0.2, 0.45] },
+    traffic: { density: 10, speedRange: [0.2, 0.45] },
     sprites: {
       types: ['tree'],
       frequency: 10,
@@ -185,7 +185,7 @@ export const LOCATIONS = [
       minLen: 20, maxLen: 50,
       minHeight: 400, maxHeight: 1500,
     },
-    traffic: { density: 15, speedRange: [0.4, 0.7] },
+    traffic: { density: 30, speedRange: [0.4, 0.7] },
     sprites: {
       types: ['tree'],
       frequency: 15,
@@ -222,7 +222,7 @@ export const LOCATIONS = [
       minLen: 8, maxLen: 20,
       minHeight: 100, maxHeight: 400,
     },
-    traffic: { density: 7, speedRange: [0.25, 0.5] },
+    traffic: { density: 14, speedRange: [0.25, 0.5] },
     sprites: {
       types: ['palm', 'tree'],
       frequency: 12,
@@ -258,7 +258,7 @@ export const LOCATIONS = [
       minLen: 10, maxLen: 25,
       minHeight: 100, maxHeight: 600,
     },
-    traffic: { density: 8, speedRange: [0.3, 0.55] },
+    traffic: { density: 16, speedRange: [0.3, 0.55] },
     sprites: {
       types: ['palm'],
       frequency: 12,
@@ -294,7 +294,7 @@ export const LOCATIONS = [
       minLen: 8, maxLen: 20,
       minHeight: 200, maxHeight: 800,
     },
-    traffic: { density: 10, speedRange: [0.3, 0.55] },
+    traffic: { density: 20, speedRange: [0.3, 0.55] },
     sprites: {
       types: ['palm', 'building'],
       frequency: 10,

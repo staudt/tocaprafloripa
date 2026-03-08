@@ -10,6 +10,7 @@ import { updatePlayer } from './player.js';
 import { render } from './render.js';
 import { drawMenuScreen, drawArrivalScreen, drawGameOverScreen } from './screens.js';
 import { updateBubble } from './dialogue.js';
+import { loadSprites } from './sprites.js';
 
 // --- Init ----------------------------------------------------------------
 
@@ -17,6 +18,7 @@ function initGame() {
   game.player.z = 0;
   game.player.x = 0;
   game.player.speed = 0;
+  game.player.steer = 0;
   game.player.jumpH = 0;
   game.player.jumpV = 0;
   game.player.climbH = 0;
@@ -75,4 +77,4 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
-requestAnimationFrame(frame);
+loadSprites().then(() => requestAnimationFrame(frame));

@@ -5,7 +5,7 @@
 import {
   ACCEL, BRAKE, DECEL, MAX_SPEED, OFF_ROAD_DECEL, UPHILL_DECEL,
   STEER_SPEED, CENTRIFUGAL, SEG_LEN, JUMP_GRAVITY, JUMP_SPEED_THRESHOLD, DT,
-  COLLISION_Z, COLLISION_X, COLLISION_INVINCIBLE, COLLISION_SPEED_MULT, COLLISION_FLASH
+  COLLISION_Z, COLLISION_X, COLLISION_INVINCIBLE, COLLISION_FLASH
 } from './config.js';
 import { game } from './state.js';
 import { isUp, isDown, isLeft, isRight } from './input.js';
@@ -168,6 +168,11 @@ export function updatePlayer() {
   const steerMul = player.jumpH > 0 ? 0.2 : 1;
   if (isLeft())  player.x -= STEER_SPEED * speedPct * steerMul;
   if (isRight()) player.x += STEER_SPEED * speedPct * steerMul;
+
+  // Smooth steer value for sprite frame selection (-1 = full left, 1 = full right)
+  if (isLeft())        player.steer = Math.max(-1, player.steer - 0.4 * DT);
+  else if (isRight())  player.steer = Math.min(1,  player.steer + 0.4 * DT);
+  else                 player.steer *= Math.max(0, 1 - 10 * DT);
 
   // Centrifugal force
   player.x -= seg.curve * speedPct * speedPct * CENTRIFUGAL * DT * steerMul;

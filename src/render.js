@@ -12,6 +12,7 @@ import { isLeft, isRight } from './input.js';
 import { getPalette } from './road.js';
 import { drawHud } from './hud.js';
 import { roundRect, drawShadedRect } from './draw.js';
+import { getSprite } from './sprites.js';
 
 const ctx = game.ctx;
 
@@ -103,20 +104,37 @@ function drawSegment(seg, clipY) {
   }
 }
 
+function carSpriteFrame(steer) {
+  if (steer < -0.6) return 0;
+  if (steer < -0.2) return 1;
+  if (steer >  0.6) return 4;
+  if (steer >  0.2) return 3;
+  return 2;
+}
+
 function drawCarSprite(car, seg, clipY) {
   const p = seg.p1.screen;
   const scale = p.scale;
   if (scale <= 0) return;
 
   const segRoadW = seg.roadWidth || ROAD_W;
-  const w = segRoadW * 0.18 * scale * CANVAS_W / 2;
-  const h = w * 1.4;
   const x = p.x + car.offset * p.w;
   const y = p.y;
 
-  if (y - h >= clipY) return;
-
-  drawShadedRect(x - w / 2, y - h, w, h, car.color);
+  const img = getSprite('bug');
+  if (img) {
+    const frameW = img.naturalWidth / 5;
+    const frameH = img.naturalHeight;
+    const w = segRoadW * 0.44 * scale * CANVAS_W / 2;
+    const h = w * (frameH / frameW);
+    if (y - h >= clipY) return;
+    ctx.drawImage(img, 2 * frameW, 0, frameW, frameH, x - w / 2, y - h, w, h);
+  } else {
+    const w = segRoadW * 0.18 * scale * CANVAS_W / 2;
+    const h = w * 1.4;
+    if (y - h >= clipY) return;
+    drawShadedRect(x - w / 2, y - h, w, h, car.color);
+  }
 }
 
 function drawRoadsideSprite(sprite, seg, clipY) {
@@ -208,27 +226,45 @@ function drawPlayerCar() {
     return;
   }
 
-  const w = 60;
-  const h = 80;
   const x = CANVAS_W / 2;
   const y = CANVAS_H - 20 - player.jumpH;
 
-  if (player.jumpH > 0) {
-    const groundY = CANVAS_H - 20;
-    const shadowScale = 1 - player.jumpH / 300;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(x - w * shadowScale / 2, groundY - 4, w * shadowScale, 4);
-  }
+  const img = getSprite('bug');
+  if (img) {
+    const frameW = img.naturalWidth / 5;
+    const frameH = img.naturalHeight;
+    const drawW = 240;
+    const drawH = drawW * (frameH / frameW);
+    const frame = carSpriteFrame(player.steer);
 
-  drawShadedRect(x - w / 2, y - h, w, h, '#2255ee');
+    if (player.jumpH > 0) {
+      const groundY = CANVAS_H - 20;
+      const shadowScale = 1 - player.jumpH / 300;
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(x - drawW * shadowScale / 2, groundY - 4, drawW * shadowScale, 4);
+    }
 
-  if (isLeft()) {
-    ctx.fillStyle = '#2255ee';
-    ctx.fillRect(x - w / 2 - 4, y - h + 10, 4, h - 20);
-  }
-  if (isRight()) {
-    ctx.fillStyle = '#2255ee';
-    ctx.fillRect(x + w / 2, y - h + 10, 4, h - 20);
+    ctx.drawImage(img, frame * frameW, 0, frameW, frameH, x - drawW / 2, y - drawH, drawW, drawH);
+  } else {
+    const w = 60;
+    const h = 80;
+
+    if (player.jumpH > 0) {
+      const groundY = CANVAS_H - 20;
+      const shadowScale = 1 - player.jumpH / 300;
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(x - w * shadowScale / 2, groundY - 4, w * shadowScale, 4);
+    }
+
+    drawShadedRect(x - w / 2, y - h, w, h, '#2255ee');
+    if (isLeft()) {
+      ctx.fillStyle = '#2255ee';
+      ctx.fillRect(x - w / 2 - 4, y - h + 10, 4, h - 20);
+    }
+    if (isRight()) {
+      ctx.fillStyle = '#2255ee';
+      ctx.fillRect(x + w / 2, y - h + 10, 4, h - 20);
+    }
   }
 }
 
